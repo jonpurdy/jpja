@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPJA</title>
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+</head>
+<body>
+  <header>JPJA Tool</header>
+  <form action="/" method="post">
+    <p>
+    <label for="domain">Domain</label>
+    <input style="width: 600px;" type="text" id="domain" name="domain" value="https://yourdomain.atlassian.net">
+    <br />
+    <label for="username">Username</label>
+    <input style="width: 600px;" type="text" id="username" name="username" value="your@email.com">
+    <br />
+    <label for="token">Token</label>
+    <input style="width: 600px;" type="text" id="token" name="token" value="your_token"><br />
+    <label for="spcustomfieldid">Story Points Custom Field ID</label>
+    <input style="width: 600px;" type="text" id="spcustomfieldid" name="spcustomfieldid" value="customfield_10027"><br />
+    <label for="jql">JQL Query</label>
+    <input style="width: 600px;" type="text" id="jql" name="jql" value="project IN (TEST) AND statuscategory NOT IN (Done)"></p>
+    <button type="submit" name="action" value="send_jql" formtarget="_blank">Submit JQL</button>
+  </form>
+</body>
+</html>
