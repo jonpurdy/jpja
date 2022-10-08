@@ -96,14 +96,10 @@ def index():
 
             # write the last domain to a file
             # later on (in jira.py), if the last domain is different than current domain, delete epics.obj
-            try:
-                with open("temp/last_domain.txt") as f:
-                    f.write(domain)
-                    f.close()
-            except FileNotFoundError:
-                f = open("temp/last_domain.txt","w")
-                f.write(domain)
-                f.close()
+ 
+            f = open("temp/last_domain.txt","w+")
+            f.write(domain)
+            f.close()
 
 
             JQL = request.form['jql']
