@@ -298,7 +298,9 @@ def timeline_all():
 def results():
     return render_template("results.html")
 
-
+@app.errorhandler(Exception)          
+def basic_error(e):          
+    return "%s: %s" % (type(e).__name__, str(e))   
 
 if __name__ == '__main__':
     app.run(debug=True)
