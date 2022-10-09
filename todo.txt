@@ -1,0 +1,5 @@
+- fix last_domain.txt issue (remove from repo and make sure w+ works on DO)
+- fix table html layout width
+- handle all errors to prevent 500 error
+- use uuid or token appended to output files so multiple users can use it at once
+
