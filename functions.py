@@ -32,12 +32,19 @@ def generate_nx_graph(all_epics_dict, issue_list, group_no_epics):
     # first construct the list of epics in the query, and No Epic
     # then add them first to the graph
     done_epics_temp = []
+    print("issue list len(): %s" % len(issue_list))
     for i in issue_list:
+        print("i: %s" % i)
+        print("doing this key: %s" % i.key)
         if i.epic is not None:
+            print("i.epic is not None")
             if all_epics_dict[i.epic] not in done_epics_temp:
+                print("all_epics_dict[i.epic] not in done_epics_temp")
                 G.add_node(all_epics_dict[i.epic])
+                print("done G.add_node(all_epics_dict[i.epic]")
                 #G.add_node(i.epic.split("-")[0] + " " + all_epics_dict[i.epic])
                 color_map.append(0)
+                print("done color_map.append(0)")
                 done_epics_temp.append(all_epics_dict[i.epic])
 
     # go through all the issues and add nodes and edges for epics

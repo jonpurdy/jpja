@@ -37,6 +37,7 @@ def test_string_to_date():
     # too lazy to test example 1
     assert e2_result.strftime("%Y-%m-%d") == example_2
 
+
 if __name__ == '__main__':
     main()
 

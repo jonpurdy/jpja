@@ -17,6 +17,8 @@ from time import sleep
 
 # Jon
 from classes import Issue
+from classes import Assignee
+
 from functions import get_time_difference_from_strings
 from functions import string_to_date
 
@@ -43,6 +45,13 @@ def get_all_epics(auth, domain):
     # filehandler = open("temp/last_domain.txt", 'r') 
     # last_domain = filehandler.readlines()
     # filehandler.close()
+
+    # example of converting from a date string in a file back to datetime object
+    # filehandler = open("temp/last_datetime.txt", 'r') 
+    # last_datetime = filehandler.readlines()
+    # filehandler.close()
+    # last_datetime_obj = datetime.datetime.strptime(last_datetime, "%Y-%m-%d-%H:%M:%S")
+    # print("Date object:", date_object)
 
     try:
         # do this domain comparison later
@@ -119,55 +128,62 @@ def load_issues(auth, domain, JQL):
 
     # first, just get the number of issues in the result to verify
     search_url_first = search_url + "&maxResults=1"
+    print("here")
     response = requests.request("GET", search_url_first, headers=headers, auth=auth)
+    print("response: %s" % response.status_code)
+
+    if response.status_code == 200:
+        number_of_issues = response.json()['total']
+        
+        print("number of issues: %s" % number_of_issues)
+
+        # next, do the full query with max 100 issues per result page
+        # I tried 200 once and it didn't work properly (only returned 100 results)
+        # Tried again 2022-06-02. 100 results is the max
+        # same issue in .get_all_epics
+        number_of_results = 100
+        x = 0
+
+        import math
+        # ceil() rounds up
+        for i in track(range(math.ceil(number_of_issues/number_of_results)), description="Paginating API calls..."):
+        # while x < number_of_issues:
+            print("x: %s" % x)
+            # "&startAt=%s&maxResults=%s"   ← original, then I added stuff to get the changelog
+            search_url_this_page = search_url + "&startAt=%s&maxResults=%s" % (x, number_of_results)
+            #search_url_this_page = search_url + "&startAt=%s&maxResults=%s&fields=summary,key,changelog,created,resolutiondate&expand=changelog" % (x, number_of_results)
+            print(search_url_this_page)
+
+            response = requests.request("GET", search_url_this_page, headers=headers, auth=auth)
+            x += number_of_results
+
+            api_issue_count = 0   # counting the number of issues returned (should match number_of_results)
+            for issue in response.json()['issues']:
+                api_issue_count += 1
+                #print("adding... %s" % issue['key'])
+                all_issues_list.append(issue)
+            print("api_issue_count: %s.  Should match %s." % (api_issue_count, number_of_results))
+
+        # write this to a file
+        # disabled 2022-09-27
+        # filehandler = open("all_issues.obj", 'wb') 
+        # pickle.dump(all_issues_list, filehandler)
 
 
-    number_of_issues = response.json()['total']
-    
-    print("number of issues: %s" % number_of_issues)
+        # print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
 
-    # next, do the full query with max 100 issues per result page
-    # I tried 200 once and it didn't work properly (only returned 100 results)
-    # Tried again 2022-06-02. 100 results is the max
-    # same issue in .get_all_epics
-    number_of_results = 100
-    x = 0
+        # for j in all_issues_list:
+        #     print(j['key'])
 
-    import math
-    # ceil() rounds up
-    for i in track(range(math.ceil(number_of_issues/number_of_results)), description="Paginating API calls..."):
-    # while x < number_of_issues:
-        print("x: %s" % x)
-        # "&startAt=%s&maxResults=%s"   ← original, then I added stuff to get the changelog
-        search_url_this_page = search_url + "&startAt=%s&maxResults=%s" % (x, number_of_results)
-        #search_url_this_page = search_url + "&startAt=%s&maxResults=%s&fields=summary,key,changelog,created,resolutiondate&expand=changelog" % (x, number_of_results)
-        print(search_url_this_page)
-
-        response = requests.request("GET", search_url_this_page, headers=headers, auth=auth)
-        x += number_of_results
-
-        api_issue_count = 0   # counting the number of issues returned (should match number_of_results)
-        for issue in response.json()['issues']:
-            api_issue_count += 1
-            #print("adding... %s" % issue['key'])
-            all_issues_list.append(issue)
-        print("api_issue_count: %s.  Should match %s." % (api_issue_count, number_of_results))
-
-    # write this to a file
-    # disabled 2022-09-27
-    # filehandler = open("all_issues.obj", 'wb') 
-    # pickle.dump(all_issues_list, filehandler)
-
-
-    # print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
-
-    # for j in all_issues_list:
-    #     print(j['key'])
+    # if code isn't 200, then the response won't matter anyway
+    else:
+        print("Response code not 200. Returning empty list.")
 
     return all_issues_list
 
 
-def get_issue_objects_list(everything, GET_IN_PROGRESS):
+def get_issue_objects_list(everything, GET_IN_PROGRESS, AUTH, DOMAIN):
+    # AUTH and DOMAIN only used if GET_IN_PROGRESS is enabled
 
     issue_list = []
     issue_types_list = []
@@ -198,6 +214,7 @@ def get_issue_objects_list(everything, GET_IN_PROGRESS):
             this_issue.assignee = "nobody"
         else:
             this_issue.assignee = i['fields']['assignee']['displayName']
+            this_issue.account_id = i['fields']['assignee']['accountId']
 
         # hack to rename "No Priority"
         if this_issue.priority == "No Priority":
@@ -206,7 +223,7 @@ def get_issue_objects_list(everything, GET_IN_PROGRESS):
 
         # parse the changelog to get the first date it was put in progress
         if GET_IN_PROGRESS:
-            changelog = get_changelog(this_issue.key)
+            changelog = get_changelog(this_issue.key, AUTH, DOMAIN)
             if changelog != 0:
                 #pprint(changelog['histories'])
                 for j in changelog['histories']:
@@ -248,19 +265,12 @@ def get_issue_objects_list(everything, GET_IN_PROGRESS):
     return issue_list, issue_types_list, priorities_list
 
 
-def get_changelog(auth, domain, jira_key):
-
-    # auth = HTTPBasicAuth(USERNAME, TOKEN)
-    # domain = DOMAIN
-
+def get_changelog(jira_key, AUTH, DOMAIN):
+    
     headers = {"Accept": "application/json"}
-    # USERNAME = ""
-    # TOKEN = ""
-    # AUTH = HTTPBasicAuth(USERNAME, TOKEN)
-    # DOMAIN = ""
 
-    # domain = DOMAIN
-    # auth = AUTH
+    domain = DOMAIN
+    auth = AUTH
 
     url = domain + "/rest/api/2/issue/%s?expand=changelog" % jira_key
 
@@ -293,5 +303,23 @@ def get_story_points_custom_field_id(AUTH, DOMAIN, headers):
     return custom_field_id
 
 
+def get_assignees_as_objects(issue_list):
+
+    assignees_list = [] # list of assignee objects
+
+    temp_assignee_ids = []  # used to deduplicate for this loop only, lazy
+    for i in issue_list:
+        if i.assignee in temp_assignee_ids:
+            pass
+        elif i.assignee == "nobody":
+            pass
+        else:
+            this_assignee = Assignee(i.account_id, i.assignee)
+            temp_assignee_ids.append(i.assignee)
+            assignees_list.append(this_assignee)
+
+    print("Done get_assignees_as_objects()")
+    return assignees_list
+    
 if __name__ == '__main__':
     main()

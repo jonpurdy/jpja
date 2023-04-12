@@ -7,6 +7,7 @@ class Issue(object):
     """
     summary = ""
     assignee = ""
+    account_id = ""
     date_created = ""
     date_completed = ""
     date_in_progress = ""
@@ -57,3 +58,15 @@ class Issue(object):
                 self.date_in_progress = d
             else:
                 pass
+
+
+class Assignee(object):
+    """ Assignee is used to track throughput
+    """
+    account_id = ""
+    display_name = ""
+    throughput = ""
+
+    def __init__(self, account_id, display_name):
+        self.account_id = account_id
+        self.display_name = display_name
