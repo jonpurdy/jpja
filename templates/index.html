@@ -138,10 +138,10 @@ function sendFormBRequest() {
       spcustomfieldidInput.value = xhr.responseText;
 
       // display a success message
-      alert("Form B response received and spcustomfieldid input field updated.");
+      console.log("Form B response received and spcustomfieldid input field updated.");
     } else {
       // display an error message
-      alert("Failed to receive Form B response.");
+      console.log("Failed to receive response.");
     }
   };
   xhr.send(formData);

@@ -24,8 +24,15 @@
 </head>
 <body>
     <header>JPJA Tool</header>
-    {%block content%}
-    {%endblock%}
+
+    <p>Done. <a href="/">Again?</a></p>
+    <script>
+        $(document).ready(function(){
+                window.open("{{url_for('issues')}}", '_blank');
+                window.open("{{url_for('timeline_all')}}", '_blank');
+                window.open("{{url_for('network_graph')}}", '_blank');
+                window.open("{{url_for('assignee_throughput')}}", '_blank');
+                 });
+    </script>
 </body>
 </html>
-

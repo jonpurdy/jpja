@@ -210,7 +210,7 @@ def plotly_graph(G, color_map):
 
     fig.update_traces(textposition='top center')
     #fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
-    fig.write_html("templates/results.html")
+    fig.write_html("templates/network_graph.html")
 
 
     #plotly.offline.plot(fig, filename = 'plot.html', auto_open=False)

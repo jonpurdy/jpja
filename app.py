@@ -120,10 +120,6 @@ def index():
             colorize_by = "issuetype"
             all_epics_dict = jira.get_all_epics(AUTH, DOMAIN)
 
-            # just for testing, needed if we don't have story point or epic link custom field ID
-            story_points_custom_field_id = jira.get_story_points_custom_field_id(AUTH, DOMAIN, headers)
-            #print("story points custom field id = %s" % story_points_custom_field_id)
-
             print("This is the JQL STRING: ",JQL)
             everything = jira.load_issues(AUTH, DOMAIN, JQL)
             if len(everything) > 0:
@@ -225,7 +221,7 @@ def index():
                 # disabled 2023-02-09
 
                 # write html table to file instead of printing it
-                f = open("templates/export.html", "w")
+                f = open("templates/issues.html", "w")
                 f.write("{% extends 'default.html' %} {%block content%}")
                 f.write(tab.get_html_string(attributes={"id":"this_table", "class":"html_table"}))
                 f.write("{%endblock%}")
@@ -363,7 +359,7 @@ def index():
 
 
                 colorize_by = "issuetype"
-                return render_template("export.html")
+                return render_template("exit.html")
            
             else:
                 message = "Getting back an empty list. Check the query to make sure it returns at least one result (result containing at least one Jira issue)."
@@ -373,14 +369,17 @@ def index():
     else:
         return render_template("index.html")
 
+@app.route('/issues',methods=['GET'])
+def issues():
+    return render_template("issues.html")
 
 @app.route('/timeline_all',methods=['GET'])
 def timeline_all():
     return render_template("timeline-all.html")
 
-@app.route('/results',methods=['GET'])
-def results():
-    return render_template("results.html")
+@app.route('/network_graph',methods=['GET'])
+def network_graph():
+    return render_template("network_graph.html")
 
 @app.route('/assignee_throughput',methods=['GET'])
 def assignee_throughput():
