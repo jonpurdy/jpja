@@ -52,7 +52,7 @@
     <label for="token">Token</label>
     <input style="width: 600px;" type="text" id="token" name="token" value="your_token"><br />
     <label for="spcustomfieldid">Story Points Custom Field ID</label>
-    <input style="width: 600px;" type="text" id="spcustomfieldid" name="spcustomfieldid" value="customfield_10027"><br />
+    <input style="width: 600px;" type="text" id="spcustomfieldid" name="spcustomfieldid" value="customfield_10027"><button type="button" onclick="sendFormBRequest()">Get Story Point Custom Field ID</button><br />
     <label for="jql">JQL Query</label>
     <input style="width: 600px;" type="text" id="jql" name="jql" value="project IN (TEST) AND statuscategory NOT IN (Done)"><br />
     Options:<br />
@@ -68,6 +68,63 @@
     <!-- <button type="submit" name="action" value="send_jql" formtarget="_blank">Submit JQL</button> -->
   </form>
 <div id="loading"></div>
+
+
+<script>
+  function sendFormBRequest() {
+    // get the input values from Form A
+    var domainValue = document.getElementById("domain").value;
+    var usernameValue = document.getElementById("username").value;
+    var tokenValue = document.getElementById("token").value;
+
+    // create Form B
+    var formB = document.createElement("form");
+    formB.method = "POST";
+    formB.action = window.location.origin + "/story_points_custom_field";
+    document.body.appendChild(formB);
+
+    // create hidden input fields for the URL, username, and token
+    var urlInput = document.createElement("input");
+    urlInput.type = "hidden";
+    urlInput.name = "url";
+    urlInput.value = formB.action;
+    formB.appendChild(urlInput);
+
+    var usernameInput = document.createElement("input");
+    usernameInput.type = "hidden";
+    usernameInput.name = "username";
+    usernameInput.value = usernameValue;
+    formB.appendChild(usernameInput);
+
+    var tokenInput = document.createElement("input");
+    tokenInput.type = "hidden";
+    tokenInput.name = "token";
+    tokenInput.value = tokenValue;
+    formB.appendChild(tokenInput);
+
+
+    // create an AJAX request to get the response from Form B
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", formB.action);
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        // get the spcustomfieldid input field from Form A
+        var spcustomfieldidInput = document.getElementById("spcustomfieldid");
+
+        // update the value of the spcustomfieldid input field with the response from Form B
+        spcustomfieldidInput.value = xhr.responseText;
+
+        // display a success message
+        alert("Form B response received and spcustomfieldid input field updated.");
+      } else {
+        // display an error message
+        alert("Failed to receive Form B response.");
+      }
+    };
+    xhr.send();
+  }
+</script>
+
 
 <script>
 function showLoading() {

@@ -121,8 +121,8 @@ def index():
             all_epics_dict = jira.get_all_epics(AUTH, DOMAIN)
 
             # just for testing, needed if we don't have story point or epic link custom field ID
-            # jira.get_story_points_custom_field_id(AUTH, DOMAIN, headers)
-            # exit()
+            story_points_custom_field_id = jira.get_story_points_custom_field_id(AUTH, DOMAIN, headers)
+            #print("story points custom field id = %s" % story_points_custom_field_id)
 
             print("This is the JQL STRING: ",JQL)
             everything = jira.load_issues(AUTH, DOMAIN, JQL)
@@ -385,6 +385,34 @@ def results():
 @app.route('/assignee_throughput',methods=['GET'])
 def assignee_throughput():
     return render_template("assignee_throughput.html")
+
+@app.route('/get_story_points_custom_field_id',methods=['GET', 'POST'])
+def story_points_custom_field():
+    if request.method == "POST":
+        # if working correct, request.form should have print an ImmutableMultiDict with values
+        print(request.form)
+
+        domain = request.form['domain']
+        username = request.form['username']
+        token = request.form['token']
+
+        # probably not needed since I prepopulate the form
+        if not domain:
+            return "domain empty"
+        if not username:
+            return "username empty"
+        if not token:
+            return "token empty"
+
+        headers = {"Accept": "application/json"}
+
+        auth = HTTPBasicAuth(username, token)
+        story_points_custom_field_id = jira.get_story_points_custom_field_id(auth, domain, headers)
+
+        return story_points_custom_field_id
+
+    else:
+        return render_template("get_sp_custom_field_id.html")
 
 @app.errorhandler(Exception)          
 def basic_error(e):          

@@ -285,20 +285,21 @@ def get_changelog(jira_key, AUTH, DOMAIN):
 
 def get_story_points_custom_field_id(AUTH, DOMAIN, headers):
 
-
-    #auth = HTTPBasicAuth(USERNAME, TOKEN)
     url = DOMAIN + "/rest/api/2/field"
     response = requests.request("GET", url, headers=headers, auth=AUTH)
     #print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
     
-    pprint(response.json())
+    # pprint = pretty print
+    # pprint(response.json())
+    # exit()
 
     custom_field_id = ""
     for i in response.json():
         if i['name'] == "Story Points":
             custom_field_id = i['id']
 
-    exit()
+    if not custom_field_id:
+        custom_field_id = "No response or empty result or other error. Check your credentials."
 
     return custom_field_id
 
