@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPJA</title>
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+
+   <style>
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            display: none;
+        }
+
+        #loading::after {
+            content: "";
+            display: block;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 5px solid #ccc;
+            border-top-color: #888;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+</head>
+<body>
+  <header>JPJA Tool</header>
+  <form action="/get_story_points_custom_field_id" method="post" id="myform" onsubmit="showLoading()">
+    <p>
+    <label for="domain">Domain</label>
+    <input style="width: 600px;" type="text" id="domain" name="domain" value="https://yourdomain.atlassian.net">
+    <br />
+    <label for="username">Username</label>
+    <input style="width: 600px;" type="text" id="username" name="username" value="your@email.com">
+    <br />
+    <label for="token">Token</label>
+    <input style="width: 600px;" type="text" id="token" name="token" value="your_token"><br />
+    <button type="submit" name="action" value="send_jql">Submit JQL</button>
+  </form>
+
+<div id="loading"></div>
+
+
+<script>
+function showLoading() {
+  document.getElementById("loading").style.display = "block";
+}
+</script>
+
+</body>
+</html>
