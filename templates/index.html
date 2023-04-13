@@ -46,23 +46,37 @@
     <label for="domain">Domain</label>
     <input style="width: 600px;" type="text" id="domain" name="domain" value="https://yourdomain.atlassian.net">
     <br />
+
     <label for="username">Username</label>
     <input style="width: 600px;" type="text" id="username" name="username" value="your@email.com">
     <br />
+
     <label for="token">Token</label>
     <input style="width: 600px;" type="text" id="token" name="token" value="your_token"><br />
-    <label for="spcustomfieldid">Story Points Custom Field ID</label>
-    <input style="width: 600px;" type="text" id="spcustomfieldid" name="spcustomfieldid" value="customfield_10027"><button type="button" onclick="sendFormBRequest()">Get Story Point Custom Field ID</button><br />
+
+    <details>
+      <summary>Story Point Custom Field ID</summary>
+          <!-- <label for="spcustomfieldid">Story Points Custom Field ID</label> -->
+          <p>Jira implements Story Points as a custom field that can differ between Jira instances. JPJA sets it to customfield_10027 by default.</p>
+          <p>If this doesn't work you can fetch it via the API. Just add your domain, username, token above and press the button below.</p>
+          <input style="width: 600px;" type="text" id="spcustomfieldid" name="spcustomfieldid" value="customfield_10027"><br />
+          <button type="button" onclick="sendFormBRequest()">Get Story Point Custom Field ID</button><br />
+    </details>    
+
     <label for="jql">JQL Query</label>
     <input style="width: 600px;" type="text" id="jql" name="jql" value="project IN (TEST) AND statuscategory NOT IN (Done)"><br />
     Options:<br />
     <input type="checkbox" id="options" name="network_graph" value="network_graph" checked>
+
     <label for="network_graph">Network graph of issues</label><br>
     <input type="checkbox" id="options" name="timeline" value="timeline" checked>
+
     <label for="timeline">Timeline</label><br>
     <input type="checkbox" id="options" name="assignee_throughput" value="assignee_throughput">
+
     <label for="assignee_throughput">Assignee throughput</label><br>
     <input type="checkbox" id="options" name="delete_cache" value="delete_cache">
+
     <label for="delete_cache">Delete cached data</label><br></p>
     <button type="submit" name="action" value="send_jql">Submit JQL</button>
     <!-- <button type="submit" name="action" value="send_jql" formtarget="_blank">Submit JQL</button> -->
@@ -71,58 +85,61 @@
 
 
 <script>
-  function sendFormBRequest() {
-    // get the input values from Form A
-    var domainValue = document.getElementById("domain").value;
-    var usernameValue = document.getElementById("username").value;
-    var tokenValue = document.getElementById("token").value;
+function sendFormBRequest() {
+  // get the input values from Form A
+  var domainValue = document.getElementById("domain").value;
+  var usernameValue = document.getElementById("username").value;
+  var tokenValue = document.getElementById("token").value;
 
-    // create Form B
-    var formB = document.createElement("form");
-    formB.method = "POST";
-    formB.action = window.location.origin + "/story_points_custom_field";
-    document.body.appendChild(formB);
+  // create Form B
+  var formB = document.createElement("form");
+  formB.method = "POST";
+  formB.action = window.location.origin + "/get_story_points_custom_field_id";
+  document.body.appendChild(formB);
 
-    // create hidden input fields for the URL, username, and token
-    var urlInput = document.createElement("input");
-    urlInput.type = "hidden";
-    urlInput.name = "url";
-    urlInput.value = formB.action;
-    formB.appendChild(urlInput);
+  // create hidden input fields for the URL, username, and token
+  var urlInput = document.createElement("input");
+  urlInput.type = "hidden";
+  urlInput.name = "url";
+  urlInput.value = formB.action;
+  formB.appendChild(urlInput);
 
-    var usernameInput = document.createElement("input");
-    usernameInput.type = "hidden";
-    usernameInput.name = "username";
-    usernameInput.value = usernameValue;
-    formB.appendChild(usernameInput);
+  var usernameInput = document.createElement("input");
+  usernameInput.type = "hidden";
+  usernameInput.name = "username";
+  usernameInput.value = usernameValue;
+  formB.appendChild(usernameInput);
 
-    var tokenInput = document.createElement("input");
-    tokenInput.type = "hidden";
-    tokenInput.name = "token";
-    tokenInput.value = tokenValue;
-    formB.appendChild(tokenInput);
+  var tokenInput = document.createElement("input");
+  tokenInput.type = "hidden";
+  tokenInput.name = "token";
+  tokenInput.value = tokenValue;
+  formB.appendChild(tokenInput);
 
+  // create a FormData object and add the form data to it
+  var formData = new FormData(formB);
+  formData.append("domain", domainValue);
 
-    // create an AJAX request to get the response from Form B
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", formB.action);
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        // get the spcustomfieldid input field from Form A
-        var spcustomfieldidInput = document.getElementById("spcustomfieldid");
+  // create an AJAX request to submit the form data
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", formB.action);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      // get the spcustomfieldid input field from Form A
+      var spcustomfieldidInput = document.getElementById("spcustomfieldid");
 
-        // update the value of the spcustomfieldid input field with the response from Form B
-        spcustomfieldidInput.value = xhr.responseText;
+      // update the value of the spcustomfieldid input field with the response from Form B
+      spcustomfieldidInput.value = xhr.responseText;
 
-        // display a success message
-        alert("Form B response received and spcustomfieldid input field updated.");
-      } else {
-        // display an error message
-        alert("Failed to receive Form B response.");
-      }
-    };
-    xhr.send();
-  }
+      // display a success message
+      alert("Form B response received and spcustomfieldid input field updated.");
+    } else {
+      // display an error message
+      alert("Failed to receive Form B response.");
+    }
+  };
+  xhr.send(formData);
+}
 </script>
 
 
